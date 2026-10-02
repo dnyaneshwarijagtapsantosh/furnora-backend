@@ -1,5 +1,6 @@
 package com.furnora.furnora_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +19,7 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonIgnore
     private Order order;
 
     @ManyToOne
@@ -28,5 +30,5 @@ public class OrderItem {
     private Integer quantity;
 
     @Column(nullable = false)
-    private Double price; // order zalyavelcha price (product cha price nantar badlala tari he record rahtoy)
+    private Double price;
 }
