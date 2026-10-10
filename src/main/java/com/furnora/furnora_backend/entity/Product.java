@@ -30,10 +30,11 @@ public class Product {
 
     private String imageUrl;
 
-    // Furniture-specific fields
-    private String material;   // e.g. Wood, Metal, Plastic
-    private String dimensions; // e.g. "120x60x75 cm"
+    private String material;
+    private String dimensions;
     private String color;
+    private String warranty;
+    private String returnPolicy;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)

@@ -1,5 +1,6 @@
 package com.furnora.furnora_backend.service;
 
+import com.furnora.furnora_backend.dto.CheckoutRequest;
 import com.furnora.furnora_backend.entity.*;
 import com.furnora.furnora_backend.repository.CartItemRepository;
 import com.furnora.furnora_backend.repository.OrderRepository;
@@ -8,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class OrderService {
@@ -26,44 +27,57 @@ public class OrderService {
     @Autowired
     private ProductRepository productRepository;
 
-    public Order checkout(User user) {
+    public Order checkout(User user, CheckoutRequest request) {
+        if (request == null || isBlank(request.getCustomerName()) || isBlank(request.getPhone())
+                || isBlank(request.getAddress()) || isBlank(request.getPaymentMethod())) {
+            throw new RuntimeException("Name, phone, address and payment method are required");
+        }
+
+        String paymentMethod = request.getPaymentMethod().trim().toUpperCase();
+        if (!paymentMethod.equals("COD") && !paymentMethod.equals("ONLINE")) {
+            throw new RuntimeException("Invalid payment method");
+        }
+
         Cart cart = cartService.getCartByUser(user);
 
         if (cart.getItems().isEmpty()) {
             throw new RuntimeException("Cart is empty, cannot checkout");
         }
 
-        // Total amount kadh
+        // Kahich badlanyachya aadhi sagalya items cha stock tapas
+        for (CartItem item : cart.getItems()) {
+            if (item.getProduct().getStock() < item.getQuantity()) {
+                throw new RuntimeException("Not enough stock for: " + item.getProduct().getName());
+            }
+        }
+
         double totalAmount = 0;
         for (CartItem item : cart.getItems()) {
             totalAmount += item.getProduct().getPrice() * item.getQuantity();
         }
 
-        // Navin Order banav
         Order order = new Order();
         order.setUser(user);
         order.setTotalAmount(totalAmount);
         order.setStatus(Order.Status.PENDING);
         order.setOrderDate(LocalDateTime.now());
+        order.setCustomerName(request.getCustomerName().trim());
+        order.setPhone(request.getPhone().trim());
+        order.setAddress(request.getAddress().trim());
+        order.setPaymentMethod(paymentMethod);
+        order.setPaymentStatus(paymentMethod.equals("ONLINE") ? "PAID_DEMO" : "PAY_ON_DELIVERY");
         order.setItems(new ArrayList<>());
 
-        // Pratyek cart item cha OrderItem banav
         for (CartItem cartItem : cart.getItems()) {
             Product product = cartItem.getProduct();
-
-            if (product.getStock() < cartItem.getQuantity()) {
-                throw new RuntimeException("Not enough stock for: " + product.getName());
-            }
 
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setProduct(product);
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPrice(product.getPrice()); // sadhyacha price save kar
-
             order.getItems().add(orderItem);
 
-            // Stock kami kar
             product.setStock(product.getStock() - cartItem.getQuantity());
             productRepository.save(product);
         }
@@ -97,5 +111,9 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         order.setStatus(newStatus);
         return orderRepository.save(order);
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

@@ -34,6 +34,16 @@ public class Order {
     @Column(nullable = false)
     private LocalDateTime orderDate = LocalDateTime.now();
 
+    // Delivery ani payment chi mahiti (junya orders sathi null asel)
+    private String customerName;
+    private String phone;
+
+    @Column(length = 500)
+    private String address;
+
+    private String paymentMethod;   // COD kinva ONLINE
+    private String paymentStatus;   // PAY_ON_DELIVERY kinva PAID_DEMO
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 

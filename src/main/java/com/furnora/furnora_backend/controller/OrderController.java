@@ -1,5 +1,6 @@
 package com.furnora.furnora_backend.controller;
 
+import com.furnora.furnora_backend.dto.CheckoutRequest;
 import com.furnora.furnora_backend.entity.Order;
 import com.furnora.furnora_backend.entity.User;
 import com.furnora.furnora_backend.service.OrderService;
@@ -23,8 +24,8 @@ public class OrderController {
     }
 
     @PostMapping("/checkout")
-    public ResponseEntity<Order> checkout() {
-        return ResponseEntity.ok(orderService.checkout(getCurrentUser()));
+    public ResponseEntity<Order> checkout(@RequestBody CheckoutRequest request) {
+        return ResponseEntity.ok(orderService.checkout(getCurrentUser(), request));
     }
 
     @GetMapping

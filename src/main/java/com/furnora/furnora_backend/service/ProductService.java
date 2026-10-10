@@ -52,6 +52,8 @@ public class ProductService {
         product.setMaterial(updatedProduct.getMaterial());
         product.setDimensions(updatedProduct.getDimensions());
         product.setColor(updatedProduct.getColor());
+                product.setWarranty(updatedProduct.getWarranty());
+        product.setReturnPolicy(updatedProduct.getReturnPolicy());
         return productRepository.save(product);
     }
 
