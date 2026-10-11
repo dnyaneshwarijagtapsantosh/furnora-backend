@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "cart_items")
 @Data
@@ -28,4 +30,7 @@ public class CartItem {
 
     @Column(nullable = false)
     private Integer quantity;
+
+    // Kevha cart madhe taakla (junya items sathi null asel)
+    private LocalDateTime addedAt;
 }

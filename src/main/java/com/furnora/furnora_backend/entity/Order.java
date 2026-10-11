@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,9 @@ public class Order {
 
     private String paymentMethod;   // COD kinva ONLINE
     private String paymentStatus;   // PAY_ON_DELIVERY kinva PAID_DEMO
+
+    // Order kevha pohochnar
+    private LocalDate expectedDeliveryDate;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();

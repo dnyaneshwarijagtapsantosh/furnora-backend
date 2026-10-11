@@ -10,6 +10,9 @@ import com.furnora.furnora_backend.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Service
 public class CartService {
 
@@ -33,22 +36,24 @@ public class CartService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
 
-        // Product aadhich cart madhe aahe ka check kar
+        LocalDate today = LocalDate.now();
+
+        // Fakt AAJ add kelela toch product asel tar quantity vadhav
         CartItem existingItem = cart.getItems().stream()
                 .filter(item -> item.getProduct().getId().equals(productId))
+                .filter(item -> item.getAddedAt() != null && item.getAddedAt().toLocalDate().equals(today))
                 .findFirst()
                 .orElse(null);
 
         if (existingItem != null) {
-            // Aadhich aahe - quantity vadhav
             existingItem.setQuantity(existingItem.getQuantity() + quantity);
             cartItemRepository.save(existingItem);
         } else {
-            // Navin item banav
             CartItem newItem = new CartItem();
             newItem.setCart(cart);
             newItem.setProduct(product);
             newItem.setQuantity(quantity);
+            newItem.setAddedAt(LocalDateTime.now());
             cart.getItems().add(newItem);
             cartItemRepository.save(newItem);
         }
